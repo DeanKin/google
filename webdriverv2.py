@@ -6,6 +6,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 import random
 import time
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+
 
 print("🚀 Starting Google Forms automation...")
 options = Options()
@@ -124,110 +126,20 @@ try:
 
     # 3. On 3rd page: total 15 questions, for each randomly select 4 or 5 options (checkboxes)
     print("📄 Page 3: Loading questions...")
-    questions_3rd_page = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[role='listitem']")))
-    selected_questions = questions_3rd_page[:21]  # Ensure only first 15 questions are handled
-    print(f"📄 Page 3: Found {len(questions_3rd_page)} question elements, processing first 15")
+    body = driver.find_element(By.TAG_NAME, "body")
+ body.send_keys(Keys.TAB)
+for _ in range(20):
+    # Press TAB twice
+    body.send_keys(Keys.TAB)
+    body.send_keys(Keys.TAB)
     
-    for i, question in enumerate(selected_questions, 1):
-        # Try to get question title/text
-        question_title = ""
-        try:
-            title_element = question.find_element(By.CSS_SELECTOR, "div[role='heading'], .freebirdFormviewerViewItemsItemItemTitle, h2, h3")
-            question_title = title_element.text.strip()
-        except:
-            question_title = f"Question {i}"
-        
-        print(f"\n📋 Page 3: Processing Question {i}")
-        print(f"   Title: {question_title}")
-        
-        # Try different selectors for options
-        options = question.find_elements(By.CSS_SELECTOR, "div[role='checkbox']")
-        question_type = "checkbox"
-        
-        if not options:
-            options = question.find_elements(By.CSS_SELECTOR, "div[role='radio']")
-            question_type = "radio"
-            
-        if not options:
-            options = question.find_elements(By.CSS_SELECTOR, "div[role='option']")
-            question_type = "option"
-            
-        if not options:
-            # Try more generic selectors
-            options = question.find_elements(By.CSS_SELECTOR, "label, .freebirdFormviewerViewItemsRadioOption, .freebirdFormviewerViewItemsCheckboxOption")
-            question_type = "generic"
-        
-        print(f"   Question type detected: {question_type}")
-        
-        if options:
-            print(f"   Available options: {len(options)}")
-            
-            # Get option texts for display
-            option_texts = []
-            for opt in options:
-                try:
-                    text = opt.text.strip()
-                    if text:
-                        option_texts.append(text)
-                    else:
-                        option_texts.append("(No text)")
-                except:
-                    option_texts.append("(Unable to read)")
-            
-            # Handle selection logic based on question type
-            if question_type == "radio":
-                # For radio buttons (like Likert scale), we can only select one
-                # But if you want 4-5 selections, this might be a different type of question
-                print("   ⚠️  Radio button detected - can only select 1 option")
-                num_to_select = 1
-                options_to_click = [random.choice(options)]
-            else:
-                # For checkboxes, select based on question number
-                if i <= 10:
-                    # First 10 questions: select exactly 4 options
-                    if len(options) >= 4:
-                        num_to_select = 4
-                        print(f"   Target selections: {num_to_select} (first 10 questions - fixed at 4)")
-                    else:
-                        num_to_select = len(options)  # Select all available if less than 4
-                        print(f"   Target selections: {num_to_select} (all available, less than 4)")
-                else:
-                    # Questions 11-21: randomly select 4 or 5 options
-                    if len(options) >= 5:
-                        num_to_select = random.choice([4, 5])
-                    elif len(options) >= 4:
-                        num_to_select = 4
-                    else:
-                        num_to_select = len(options)  # Select all available if less than 4
-                    print(f"   Target selections: {num_to_select} (questions 11-21 - random 4 or 5)")
-                
-                # Randomly select num_to_select unique options
-                options_to_click = random.sample(options, num_to_select)
-            
-            selected_texts = []
-            for j, opt in enumerate(options_to_click):
-                driver.execute_script("arguments[0].scrollIntoView(true);", opt)
-                time.sleep(0.3)  # Small delay to ensure element is ready
-                try:
-                    opt.click()
-                except:
-                    # If regular click fails, try JavaScript click
-                    driver.execute_script("arguments[0].click();", opt)
-                
-                # Get the text of selected option
-                selected_index = options.index(opt)
-                if selected_index < len(option_texts):
-                    selected_texts.append(option_texts[selected_index])
-                
-                # Small delay between clicks to ensure registration
-                time.sleep(0.2)
-            
-            print(f"   ✓ Selected {len(options_to_click)} out of {len(options)} options:")
-            for text in selected_texts:
-                print(f"     • {text}")
-        else:
-            print(f"   ❌ No selectable options found for question {i}")
+    # Randomly press RIGHT 3 or 4 times
+    presses = random.choice([3, 4])
+    for _ in range(presses):
+        body.send_keys(Keys.ARROW_RIGHT)
 
+    # Small delay to allow the selection to register before next loop
+    time.sleep(0.3)
     print("✓ Page 3: All 15 questions completed")
     
     # Submit the form
@@ -279,3 +191,4 @@ finally:
     print("🔚 Closing browser...")
     driver.quit()
     print("✓ Browser closed successfully")
+
