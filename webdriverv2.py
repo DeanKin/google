@@ -127,16 +127,17 @@ try:
     # 3. On 3rd page: total 15 questions, for each randomly select 4 or 5 options (checkboxes)
     print("📄 Page 3: Loading questions...")
     body = driver.find_element(By.TAG_NAME, "body")
- body.send_keys(Keys.TAB)
-for _ in range(20):
-    # Press TAB twice
-    body.send_keys(Keys.TAB)
-    body.send_keys(Keys.TAB)
-    
-    # Randomly press RIGHT 3 or 4 times
-    presses = random.choice([3, 4])
+
+    for _ in range(20):
+        # Press TAB twice
+        body.send_keys(Keys.TAB)
+        body.send_keys(Keys.TAB)
+        
+        # Randomly press RIGHT 3 or 4 times
+        presses = random.choice([3, 4])
     for _ in range(presses):
         body.send_keys(Keys.ARROW_RIGHT)
+        
 
     # Small delay to allow the selection to register before next loop
     time.sleep(0.3)

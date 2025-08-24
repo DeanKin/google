@@ -6,6 +6,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import random
 import time
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
 
 print("🚀 Starting Google Forms automation...")
 options = Options()
@@ -246,6 +247,29 @@ try:
             print(f"   ❌ No selectable options found for question {i}")
 
     print("✓ Page 3: All 15 questions completed")
+    
+    # Navigate to form elements using TAB keys
+    body = driver.find_element(By.TAG_NAME, "body")
+    
+    # Initial TAB navigation to reach form elements
+    for _ in range(12):
+        body.send_keys(Keys.TAB)
+    
+    # Process form questions using TAB and arrow keys
+    for _ in range(20):
+        # Press TAB twice to move between questions
+        body.send_keys(Keys.TAB)
+        body.send_keys(Keys.TAB)
+        
+        # Randomly press RIGHT 3 or 4 times to select options
+        presses = random.choice([3, 4])
+        for _ in range(presses):
+            body.send_keys(Keys.ARROW_RIGHT)
+        
+        # Small delay to allow the selection to register before next loop
+        time.sleep(0.3)
+    
+    print("✓ Page 3: All 20 questions completed")
     
     # Submit the form
     print("📤 Looking for Submit button...")
